@@ -62,6 +62,31 @@ python3 server.py --server
 # Acesse http://localhost:8888
 ```
 
+## Acesso mobile
+
+Ao rodar `sunny --server`, o terminal mostra um **QR code** — escaneie com o celular para abrir direto no browser. Os dois dispositivos precisam estar na mesma rede WiFi.
+
+```
+  ╔═══════════════════════════════════╗
+  ║          Sunny rodando!           ║
+  ╚═══════════════════════════════════╝
+
+  Local:    http://localhost:8888
+  Rede:     http://192.168.1.42:8888
+
+  ██ █ ██ ██    ← QR code aqui
+  █ ██ █ █ █
+  ...
+
+  Escaneie o QR code acima com o celular
+```
+
+Para acesso fora da rede local (ex: compartilhar com alguem):
+```bash
+sunny --server --tunnel
+# Gera uma URL publica temporaria via cloudflared
+```
+
 ## Modos de uso
 
 | Flag | Descricao |
@@ -73,10 +98,7 @@ python3 server.py --server
 
 ```bash
 # Porta customizada
-PORT=9000 python3 server.py --server
-
-# Acesso externo (requer cloudflared instalado)
-python3 server.py --server --tunnel
+PORT=9000 sunny --server
 ```
 
 ## Configuracao

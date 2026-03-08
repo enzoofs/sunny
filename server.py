@@ -724,8 +724,20 @@ def main():
     port = int(os.environ.get("PORT", 8888))
 
     if "--server" in sys.argv:
-        print(f"Sunny rodando em http://0.0.0.0:{port}")
-        print(f"Acesse de outro dispositivo: http://{get_local_ip()}:{port}")
+        local_ip = get_local_ip()
+        url = f"http://{local_ip}:{port}"
+        print()
+        print("  ╔═══════════════════════════════════╗")
+        print("  ║          Sunny rodando!           ║")
+        print("  ╚═══════════════════════════════════╝")
+        print()
+        print(f"  Local:    http://localhost:{port}")
+        print(f"  Rede:     {url}")
+        print()
+        _print_qr(url)
+        print("  Escaneie o QR code acima com o celular")
+        print("  (ambos devem estar na mesma rede WiFi)")
+        print()
         if "--tunnel" in sys.argv:
             t_tunnel = threading.Thread(target=start_tunnel, args=(port,), daemon=True)
             t_tunnel.start()
@@ -742,6 +754,38 @@ def main():
             min_size=(800, 500),
         )
         webview.start()
+
+
+def _print_qr(text):
+    """Gera QR code ASCII no terminal (sem dependencias externas)."""
+    try:
+        # Tenta usar qrcode se instalado
+        import qrcode  # type: ignore
+        qr = qrcode.QRCode(box_size=1, border=1)
+        qr.add_data(text)
+        qr.make(fit=True)
+        # Usa blocos unicode — cada linha combina 2 rows do QR em 1 char
+        matrix = qr.get_matrix()
+        rows = len(matrix)
+        for r in range(0, rows, 2):
+            line = "  "
+            for c in range(len(matrix[0])):
+                top = matrix[r][c]
+                bot = matrix[r + 1][c] if r + 1 < rows else False
+                if top and bot:
+                    line += "\u2588"      # full block
+                elif top and not bot:
+                    line += "\u2580"      # upper half
+                elif not top and bot:
+                    line += "\u2584"      # lower half
+                else:
+                    line += " "
+            print(line)
+        print()
+    except ImportError:
+        # Sem qrcode instalado — mostra URL grande e legivel
+        print(f"  (instale 'pip install qrcode' para ver QR code no terminal)")
+        print()
 
 
 def get_local_ip():
