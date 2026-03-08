@@ -30,11 +30,27 @@ Hero banner com titulo em destaque, rows de tendencias, generos aleatorios e con
 Filtros por genero (shounen, isekai, romance...), toggle adulto, ordenacao por popularidade ou nota.
 </details>
 
-## Inicio rapido
+## Instalacao
+
+### Um comando (Linux / macOS)
+
+```bash
+curl -sL https://raw.githubusercontent.com/enzoofs/sunny/main/install.sh | bash
+```
+
+Isso baixa, instala em `~/.local/share/sunny` e cria o comando `sunny`.
+Depois e so rodar:
+
+```bash
+sunny --server
+# Acesse http://localhost:8888
+```
+
+### Manual (ou Windows)
 
 ```bash
 # 1. Clone o repositorio
-git clone https://github.com/enzfrn/sunny.git
+git clone https://github.com/enzoofs/sunny.git
 cd sunny
 
 # 2. Configure a API key do TMDB (gratuita)
