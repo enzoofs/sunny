@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sunny</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Setup Modal -->
+  <div id="setup-modal" class="modal hidden">
+    <div class="modal-content setup">
+      <h2>Configurar Sunny</h2>
+      <p>Precisa de uma chave da API do TMDB (gratuita) para buscar posters e info.</p>
+      <ol>
+        <li>Acesse <a href="https://www.themoviedb.org/signup" target="_blank">themoviedb.org/signup</a></li>
+        <li>Crie uma conta gratuita</li>
+        <li>Va em Settings &gt; API e copie a "API Key (v3 auth)"</li>
+      </ol>
+      <input type="text" id="api-key-input" placeholder="Cole sua TMDB API Key aqui...">
+      <button onclick="saveApiKey()">Salvar</button>
+    </div>
+  </div>
+
+  <!-- Detail Modal -->
+  <div id="detail-modal" class="modal hidden" onclick="if(event.target===this)closeDetail()">
+    <div class="modal-content detail">
+      <button class="close-btn" onclick="closeDetail()" aria-label="Fechar">&times;</button>
+      <div id="detail-backdrop"></div>
+      <div id="detail-body"></div>
+    </div>
+  </div>
+
+  <!-- Video Player Modal -->
+  <div id="player-modal" class="modal hidden" onclick="if(event.target===this)closePlayer()">
+    <div class="player-container">
+      <button class="close-btn player-close" onclick="closePlayer()" aria-label="Fechar player">&times;</button>
+      <div id="player-loading" class="loading" style="color:#fff;padding:40px;">Extraindo stream...</div>
+      <video id="hls-video" controls playsinline style="display:none;width:100%;height:100%;background:#000;"></video>
+      <div id="player-top-controls" style="display:none;position:absolute;top:8px;left:8px;z-index:20;display:flex;gap:8px;">
+        <button id="cast-btn" class="btn btn-info" onclick="castToTV()" style="display:none;font-size:12px;padding:6px 12px;" title="Enviar para TV" aria-label="Enviar para TV">&#128250; TV</button>
+        <button id="share-btn" class="btn btn-info" onclick="shareStream()" style="display:none;font-size:12px;padding:6px 12px;" title="Abrir em outro app" aria-label="Compartilhar stream">&#128279; Abrir em...</button>
+      </div>
+      <div id="player-controls" style="display:none;position:absolute;bottom:8px;left:0;right:0;justify-content:center;align-items:center;gap:16px;padding:8px;z-index:20;"></div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="header-left">
+      <h1 class="logo" onclick="navigate('home')" style="cursor:pointer;">SUNNY</h1>
+      <nav>
+        <a href="#" class="nav-link active nav-hide-mobile" data-section="home" onclick="navigate('home')">Inicio</a>
+        <a href="#" class="nav-link" data-section="anime" onclick="navigate('anime')">Anime</a>
+        <a href="#" class="nav-link" data-section="series" onclick="navigate('series')">Series</a>
+        <a href="#" class="nav-link" data-section="movies" onclick="navigate('movies')">Filmes</a>
+      </nav>
+    </div>
+    <div class="header-right">
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="Buscar..." onkeydown="if(event.key==='Enter')doSearch()">
+        <button onclick="doSearch()" aria-label="Buscar">&#128269;</button>
+      </div>
+      <button class="icon-btn" onclick="showSetup()" title="Configuracoes" aria-label="Configuracoes">&#9881;</button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="main-content"></main>
+
+  <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="app.js"></script>
+</body>
+</html>

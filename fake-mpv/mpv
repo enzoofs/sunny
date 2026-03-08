@@ -1,0 +1,35 @@
+#!/bin/bash
+# Fake mpv that captures the stream URL and headers instead of playing.
+# Luffy calls: mpv URL --referrer=REF --user-agent=UA --force-media-title=TITLE [--sub-file=SUB...]
+
+URL=""
+REFERER=""
+USER_AGENT=""
+SUBS=""
+
+for arg in "$@"; do
+  case "$arg" in
+    --referrer=*) REFERER="${arg#--referrer=}" ;;
+    --user-agent=*) USER_AGENT="${arg#--user-agent=}" ;;
+    --sub-file=*) SUBS="${SUBS}${arg#--sub-file=}\n" ;;
+    --force-media-title=*) ;; # ignore
+    --watch-later-directory=*) ;; # ignore
+    --write-filename-in-watch-later-config) ;; # ignore
+    --save-position-on-quit) ;; # ignore
+    --start=*) ;; # ignore
+    --*) ;; # ignore other flags
+    *) URL="$arg" ;;
+  esac
+done
+
+# Write to the output file specified by FAKE_MPV_OUTPUT env var
+OUT="${FAKE_MPV_OUTPUT:-/tmp/luffy-stream-result.json}"
+
+cat > "$OUT" << JSONEOF
+{
+  "url": "$URL",
+  "referer": "$REFERER",
+  "user_agent": "$USER_AGENT",
+  "subtitles": "$(echo -ne "$SUBS" | head -c -1)"
+}
+JSONEOF
