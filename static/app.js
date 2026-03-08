@@ -12,8 +12,6 @@ function esc(str) {
 let currentSection = "home";
 let animeCurrentGenre = null;
 let animeSort = "popular"; // "popular" or "top_rated"
-let animeAdult = false;
-
 // --- API helpers ---
 async function api(path) {
   const resp = await fetch(path);
@@ -71,9 +69,8 @@ async function saveApiKey() {
 // --- Navigation ---
 function navigate(section) {
   currentSection = section;
-  const activeNav = section === "adult" ? "anime" : section;
   document.querySelectorAll(".nav-link").forEach((el) => {
-    el.classList.toggle("active", el.dataset.section === activeNav);
+    el.classList.toggle("active", el.dataset.section === section);
   });
   const main = document.getElementById("main-content");
   main.innerHTML = '<div class="loading">Carregando...</div>';
@@ -82,7 +79,6 @@ function navigate(section) {
   else if (section === "anime") loadAnime();
   else if (section === "series") loadSeries(null, "popular");
   else if (section === "movies") loadMovies(null, "popular");
-  else if (section === "adult") loadAdult();
 }
 
 // --- Render helpers ---
@@ -641,22 +637,15 @@ function makeAnimeChips(categories, activeGenre) {
 
   const genreArg = activeGenre ? "'" + activeGenre + "'" : "null";
 
-  // Sort buttons + Adult toggle
+  // Sort buttons
   chips.innerHTML = `
     <button class="chip ${animeSort === 'popular' ? 'chip-active' : ''}" id="chip-popular">Popular</button>
     <button class="chip ${animeSort === 'top_rated' ? 'chip-active' : ''}" id="chip-toprated">Maior Nota</button>
-    <span style="width:1px;height:20px;background:rgba(255,255,255,0.15);margin:0 4px;"></span>
-    <button class="chip ${animeAdult ? 'chip-adult-active' : 'chip-adult'}" id="chip-adult">Adulto</button>
     <span style="width:1px;height:20px;background:rgba(255,255,255,0.15);margin:0 4px;"></span>
     <button class="chip ${!activeGenre ? 'chip-active' : ''}" id="chip-all">Todos</button>
   `;
   chips.querySelector("#chip-popular").onclick = () => loadAnime(activeGenre, "popular");
   chips.querySelector("#chip-toprated").onclick = () => loadAnime(activeGenre, "top_rated");
-  chips.querySelector("#chip-adult").onclick = () => {
-    animeAdult = !animeAdult;
-    if (animeAdult) { currentSection = "adult"; loadAdult(); }
-    else { currentSection = "anime"; loadAnime(); }
-  };
   chips.querySelector("#chip-all").onclick = () => loadAnime(null);
 
   categories.forEach((cat) => {
@@ -1339,227 +1328,5 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-// --- Adult Section ---
-
-function makeAdultCard(video) {
-  const div = document.createElement("div");
-  div.className = "card";
-  div.onclick = () => showAdultDetail(video.slug);
-  div.innerHTML = `
-    ${video.poster_url ? `<img src="${esc(video.poster_url)}" alt="${esc(video.name)}" loading="lazy">` : `<div style="width:100%;height:278px;background:#222;display:flex;align-items:center;justify-content:center;color:#555;">${esc(video.name)}</div>`}
-    <div class="card-info">
-      <div class="card-title">${esc(video.name)}</div>
-      <div class="card-meta">${video.views ? (video.views > 1000000 ? (video.views / 1000000).toFixed(1) + "M" : Math.floor(video.views / 1000) + "K") + " views" : ""}</div>
-    </div>
-  `;
-  return div;
-}
-
-function makeAdultRow(title, videos) {
-  const section = document.createElement("div");
-  section.className = "row";
-  section.innerHTML = `<h3 class="row-title">${esc(title)}</h3>`;
-  const scroll = document.createElement("div");
-  scroll.className = "row-scroll";
-  videos.forEach((v) => scroll.appendChild(makeAdultCard(v)));
-  section.appendChild(scroll);
-  return section;
-}
-
-async function loadAdult(activeTag = null) {
-  const main = document.getElementById("main-content");
-  main.innerHTML = '<div class="loading">Carregando...</div>';
-
-  if (activeTag) {
-    await loadAdultTag(main, activeTag);
-    return;
-  }
-
-  const [trending, newest, popular, topRated, tags] = await Promise.all([
-    api("/api/adult/trending"),
-    api("/api/adult/new"),
-    api("/api/adult/popular"),
-    api("/api/adult/top"),
-    api("/api/adult/tags"),
-  ]);
-
-  main.innerHTML = "";
-
-  // Back to anime + tag chips
-  const chips = document.createElement("div");
-  chips.className = "anime-chips";
-  const backBtn = document.createElement("button");
-  backBtn.className = "chip chip-adult-active";
-  backBtn.textContent = "Adulto";
-  backBtn.onclick = () => { animeAdult = false; currentSection = "anime"; navigate("anime"); };
-  chips.appendChild(backBtn);
-  if (Array.isArray(tags)) {
-    const sep = document.createElement("span");
-    sep.style.cssText = "width:1px;height:20px;background:rgba(255,255,255,0.15);margin:0 4px;";
-    chips.appendChild(sep);
-    const allBtn = document.createElement("button");
-    allBtn.className = `chip ${!activeTag ? "chip-active" : ""}`;
-    allBtn.textContent = "Todos";
-    allBtn.onclick = () => loadAdult();
-    chips.appendChild(allBtn);
-    tags.forEach((tag) => {
-      const btn = document.createElement("button");
-      btn.className = "chip";
-      btn.textContent = tag;
-      btn.onclick = () => loadAdult(tag);
-      chips.appendChild(btn);
-    });
-  }
-  main.appendChild(chips);
-
-  // Hero from trending
-  if (Array.isArray(trending) && trending.length > 0) {
-    const hero = trending[0];
-    const heroDiv = document.createElement("div");
-    heroDiv.className = "hero";
-    heroDiv.innerHTML = `
-      <div class="hero-bg" style="background-image:url('${esc(hero.cover_url || hero.poster_url)}')"></div>
-      <div class="hero-info">
-        <h2>${esc(hero.name)}</h2>
-        <div class="hero-buttons">
-          <button class="btn btn-play" id="ahero-play">&#9654; Assistir</button>
-          <button class="btn btn-info" id="ahero-info">&#9432; Detalhes</button>
-        </div>
-      </div>
-    `;
-    heroDiv.querySelector("#ahero-play").onclick = () => playAdult(hero.slug);
-    heroDiv.querySelector("#ahero-info").onclick = () => showAdultDetail(hero.slug);
-    main.appendChild(heroDiv);
-  }
-
-  if (Array.isArray(trending) && trending.length > 0) {
-    main.appendChild(makeAdultRow("Em Alta", trending));
-  }
-  if (Array.isArray(newest) && newest.length > 0) {
-    main.appendChild(makeAdultRow("Novos", newest));
-  }
-  if (Array.isArray(popular) && popular.length > 0) {
-    main.appendChild(makeAdultRow("Mais Vistos", popular));
-  }
-  if (Array.isArray(topRated) && topRated.length > 0) {
-    main.appendChild(makeAdultRow("Mais Curtidos", topRated));
-  }
-}
-
-async function loadAdultTag(main, tag) {
-  const [videos, tags] = await Promise.all([
-    api(`/api/adult/tag?tag=${encodeURIComponent(tag)}`),
-    api("/api/adult/tags"),
-  ]);
-
-  main.innerHTML = "";
-
-  // Back to anime + tag chips
-  const chips = document.createElement("div");
-  chips.className = "anime-chips";
-  const backBtn = document.createElement("button");
-  backBtn.className = "chip chip-adult-active";
-  backBtn.textContent = "Adulto";
-  backBtn.onclick = () => { animeAdult = false; currentSection = "anime"; navigate("anime"); };
-  chips.appendChild(backBtn);
-  const sep = document.createElement("span");
-  sep.style.cssText = "width:1px;height:20px;background:rgba(255,255,255,0.15);margin:0 4px;";
-  chips.appendChild(sep);
-  if (Array.isArray(tags)) {
-    const allBtn = document.createElement("button");
-    allBtn.className = "chip";
-    allBtn.textContent = "Todos";
-    allBtn.onclick = () => loadAdult();
-    chips.appendChild(allBtn);
-    tags.forEach((t) => {
-      const btn = document.createElement("button");
-      btn.className = `chip ${t === tag ? "chip-active" : ""}`;
-      btn.textContent = t;
-      btn.onclick = () => loadAdult(t);
-      chips.appendChild(btn);
-    });
-  }
-  main.appendChild(chips);
-
-  const titleEl = document.createElement("div");
-  titleEl.className = "section-title";
-  titleEl.textContent = tag.charAt(0).toUpperCase() + tag.slice(1);
-  main.appendChild(titleEl);
-
-  const grid = document.createElement("div");
-  grid.className = "results-grid";
-  if (Array.isArray(videos)) {
-    videos.forEach((v) => grid.appendChild(makeAdultCard(v)));
-  }
-  main.appendChild(grid);
-}
-
-async function showAdultDetail(slug) {
-  const modal = document.getElementById("detail-modal");
-  const backdrop = document.getElementById("detail-backdrop");
-  const body = document.getElementById("detail-body");
-
-  modal.classList.remove("hidden");
-  body.innerHTML = '<div class="loading">Carregando...</div>';
-  backdrop.style.backgroundImage = "";
-
-  const data = await api(`/api/adult/video?slug=${encodeURIComponent(slug)}`);
-  if (data.error) {
-    body.innerHTML = `<p>${esc(data.error)}</p>`;
-    return;
-  }
-
-  if (data.cover_url) {
-    backdrop.style.backgroundImage = `url('${esc(data.cover_url)}')`;
-  }
-
-  const duration = data.duration_in_ms ? Math.round(data.duration_in_ms / 60000) + " min" : "";
-  const tagsHtml = (data.tags || []).map((t) => `<span class="chip chip-small">${esc(t)}</span>`).join("");
-
-  let franchiseHtml = "";
-  if (data.franchise_videos && data.franchise_videos.length > 1) {
-    franchiseHtml = `<div class="similar-row"><h3 class="row-title">${esc(data.franchise)}</h3><div class="row-scroll" id="adult-franchise-scroll"></div></div>`;
-  }
-
-  let nextHtml = "";
-  if (data.next_video) {
-    nextHtml = `<div style="margin-top:16px;"><span style="color:#888;">Proximo:</span> <a href="#" id="adult-next" style="color:#e74c3c;">${esc(data.next_video.name)}</a></div>`;
-  }
-
-  body.innerHTML = `
-    <h2>${esc(data.name)}</h2>
-    <div class="meta">
-      ${duration ? `<span>${esc(duration)}</span>` : ""}
-      ${data.brand ? `<span>${esc(data.brand)}</span>` : ""}
-      <span>${data.is_censored ? "Censurado" : "Sem censura"}</span>
-      <span>${(data.views || 0).toLocaleString()} views</span>
-    </div>
-    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">${tagsHtml}</div>
-    <div class="play-section">
-      <button class="btn btn-play" id="adult-play">&#9654; Assistir</button>
-    </div>
-    <div class="overview">${esc(data.description || "")}</div>
-    ${nextHtml}
-    ${franchiseHtml}
-  `;
-
-  body.querySelector("#adult-play").onclick = () => playAdult(slug);
-
-  if (data.next_video) {
-    body.querySelector("#adult-next").onclick = (e) => {
-      e.preventDefault();
-      showAdultDetail(data.next_video.slug);
-    };
-  }
-
-  if (data.franchise_videos && data.franchise_videos.length > 1) {
-    const scroll = document.getElementById("adult-franchise-scroll");
-    data.franchise_videos.forEach((fv) => scroll.appendChild(makeAdultCard(fv)));
-  }
-}
-
-function playAdult(slug) {
-  window.open(`https://hanime.tv/videos/hentai/${encodeURIComponent(slug)}`, "_blank");
-}
 
 init();

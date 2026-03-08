@@ -1,6 +1,6 @@
 # Sunny
 
-Interface visual estilo Netflix para streaming de filmes, series, anime e conteudo adulto. Agrega metadados do TMDB e Jikan (MyAnimeList), com streaming integrado via multiplos provedores, player no browser (HLS.js) ou mpv local.
+Interface visual estilo Netflix para streaming de filmes, series e anime. Agrega metadados do TMDB e Jikan (MyAnimeList), com streaming integrado via multiplos provedores, player no browser (HLS.js) ou mpv local.
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
@@ -8,7 +8,7 @@ Interface visual estilo Netflix para streaming de filmes, series, anime e conteu
 
 ## Funcionalidades
 
-- **Catalogo completo** — Filmes, series, anime e conteudo adulto em uma interface unificada
+- **Catalogo completo** — Filmes, series e anime em uma interface unificada
 - **Streaming multi-provedor** — Extrai streams de multiplas fontes em paralelo, usa o primeiro disponivel
 - **Player integrado** — HLS.js no browser com controles, Chromecast e compartilhamento
 - **Modo desktop** — Janela nativa via pywebview com reprodutor mpv
@@ -27,7 +27,7 @@ Hero banner com titulo em destaque, rows de tendencias, generos aleatorios e con
 
 <details>
 <summary>Aba de Anime</summary>
-Filtros por genero (shounen, isekai, romance...), toggle adulto, ordenacao por popularidade ou nota.
+Filtros por genero (shounen, isekai, romance...), ordenacao por popularidade ou nota.
 </details>
 
 ## Instalacao
@@ -135,7 +135,6 @@ Sunny
 │   ├── flixhq.py             # Scraping FlixHQ (busca, temporadas, episodios)
 │   ├── embeds.py              # Provedores rapidos via TMDB ID (autoembed, 2embed)
 │   ├── decrypt.py             # Decryption de streams (megacloud, embed.su, generico)
-│   ├── adult.py               # Integracao com API de conteudo adulto
 │   └── http.py                # Helpers HTTP
 ├── static/                    # Frontend
 │   ├── index.html             # Shell da aplicacao
@@ -219,19 +218,6 @@ Os provedores correm em paralelo — o primeiro a retornar um stream valido ganh
 | `/api/anime/search?q=` | GET | Busca de anime |
 | `/api/anime/details?id=` | GET | Detalhes completos |
 
-### Conteudo adulto
-
-| Rota | Metodo | Descricao |
-|------|--------|-----------|
-| `/api/adult/trending` | GET | Em alta este mes |
-| `/api/adult/new` | GET | Lancamentos recentes |
-| `/api/adult/popular` | GET | Mais vistos (all-time) |
-| `/api/adult/top` | GET | Mais curtidos |
-| `/api/adult/tags` | GET | Tags populares |
-| `/api/adult/tag?tag=` | GET | Filtrar por tag |
-| `/api/adult/search?q=` | GET | Busca por texto |
-| `/api/adult/video?slug=` | GET | Detalhes do video |
-
 ### Streaming e reproducao
 
 | Rota | Metodo | Descricao |
@@ -278,7 +264,7 @@ python3 -m unittest tests.test_decrypt -v
 **Backend:** Python 3 stdlib (`http.server`, `urllib`, `json`, `re`, `sqlite3`, `threading`)
 **Frontend:** HTML5 + CSS3 + Vanilla JavaScript
 **Bibliotecas externas:** HLS.js (player), Google Cast SDK (Chromecast)
-**APIs:** TMDB, Jikan (MyAnimeList), HTV Services
+**APIs:** TMDB, Jikan (MyAnimeList)
 
 ## Licenca
 

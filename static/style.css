@@ -265,18 +265,6 @@ main {
   color: #fff;
 }
 .chip-active:hover { background: var(--accent2); }
-.chip-adult {
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(255,60,60,0.3);
-  color: #888;
-}
-.chip-adult:hover { background: rgba(255,60,60,0.15); color: #e74c3c; }
-.chip-adult-active {
-  background: #e74c3c;
-  border-color: #e74c3c;
-  color: #fff;
-}
-.chip-adult-active:hover { background: #c0392b; }
 .chip-small {
   padding: 3px 10px;
   font-size: 11px;
