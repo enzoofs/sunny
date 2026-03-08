@@ -286,4 +286,4 @@ MIT
 
 ---
 
-Desenvolvido por [Enzo Fernandes](https://github.com/enzfrn)
+Desenvolvido por [Enzo Fernandes](https://github.com/enzoofs)

@@ -239,13 +239,13 @@ function makeAnimeHero(anime) {
       ${genres ? `<p style="color:#aaa;font-size:13px;margin-bottom:4px;">${esc(genres)}</p>` : ""}
       <p>${esc(synopsis)}</p>
       <div class="hero-buttons">
-        <button class="btn btn-play anime-hero-play">&#9654; Assistir</button>
-        <button class="btn btn-info anime-hero-info">&#9432; Mais Info</button>
+        <button class="btn btn-play">&#9654; Assistir</button>
+        <button class="btn btn-info">&#9432; Mais Info</button>
       </div>
     </div>
   `;
-  div.querySelector(".anime-hero-play").onclick = () => playTitle(title, null, null, true);
-  div.querySelector(".anime-hero-info").onclick = () => showAnimeDetail(malId);
+  div.querySelector(".btn-play").onclick = () => playTitle(title, null, null, true);
+  div.querySelector(".btn-info").onclick = () => showAnimeDetail(malId);
   return div;
 }
 
