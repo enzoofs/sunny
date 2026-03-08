@@ -307,9 +307,6 @@ class CatalogHandler(SimpleHTTPRequestHandler):
         elif path.startswith("/api/anime"):
             self._handle_anime(path, params)
 
-        elif path.startswith("/api/adult"):
-            self._handle_adult(path, params)
-
         else:
             super().do_GET()
 
@@ -616,54 +613,6 @@ class CatalogHandler(SimpleHTTPRequestHandler):
                 "type": "tv", "sfw": "true",
             })
             self._json_response(data)
-
-    def _handle_adult(self, path, params):
-        from provider.adult import (
-            browse_trending, browse_new, browse_popular, browse_top_rated,
-            browse_tag, search as adult_search, get_video_info, POPULAR_TAGS
-        )
-        try:
-            if path == "/api/adult/trending":
-                self._json_response(browse_trending())
-
-            elif path == "/api/adult/new":
-                self._json_response(browse_new())
-
-            elif path == "/api/adult/popular":
-                self._json_response(browse_popular())
-
-            elif path == "/api/adult/top":
-                self._json_response(browse_top_rated())
-
-            elif path == "/api/adult/tags":
-                self._json_response(POPULAR_TAGS)
-
-            elif path == "/api/adult/tag":
-                tag = params.get("tag", "")
-                if not tag:
-                    self._json_response({"error": "Tag required"})
-                    return
-                self._json_response(browse_tag(tag))
-
-            elif path == "/api/adult/search":
-                q = params.get("q", "")
-                if not q:
-                    self._json_response({"error": "Query required"})
-                    return
-                self._json_response(adult_search(q))
-
-            elif path == "/api/adult/video":
-                slug = params.get("slug", "")
-                if not slug:
-                    self._json_response({"error": "Slug required"})
-                    return
-                self._json_response(get_video_info(slug))
-
-            else:
-                self._json_response(browse_trending())
-        except Exception as e:
-            log.exception("Adult API error")
-            self._json_response({"error": str(e)})
 
     def _json_response(self, data, status=200):
         body = json.dumps(data).encode()
