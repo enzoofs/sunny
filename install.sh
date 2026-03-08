@@ -58,6 +58,10 @@ exec python3 server.py "$@"
 LAUNCHER
 chmod +x "$BIN_DIR/sunny"
 
+# Instalar qrcode para QR code no terminal (opcional, silencioso)
+python3 -m pip install qrcode --quiet --break-system-packages 2>/dev/null || \
+python3 -m pip install qrcode --quiet 2>/dev/null || true
+
 # Verificar se ~/.local/bin esta no PATH
 if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
     echo ""
