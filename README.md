@@ -2,6 +2,8 @@
 
 Interface visual estilo Netflix para streaming de filmes, series e anime. Agrega metadados do TMDB e Jikan (MyAnimeList), com streaming integrado via multiplos provedores, player no browser (HLS.js) ou mpv local.
 
+> Inspirado no [Luffy](https://github.com/DemonKingSwarn/luffy) por [DemonKingSwarn](https://github.com/DemonKingSwarn) — CLI open-source para streaming de filmes e series. O Sunny nasceu como uma evolucao visual do conceito, adicionando interface grafica estilo Netflix, catalogo com metadados (TMDB/Jikan), streaming no browser via HLS.js, suporte a Chromecast, modo mobile responsivo e acesso remoto via tunnel.
+
 ![Python](https://img.shields.io/badge/Python-3.8+-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey)
