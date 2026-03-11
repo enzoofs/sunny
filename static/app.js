@@ -33,16 +33,26 @@ async function apiPost(path, body) {
 }
 
 // --- Init ---
+// Gerencia search box mobile: cria/remove conforme largura da tela
 function setupMobileSearch() {
-  if (window.innerWidth > 768) return;
   const headerLeft = document.querySelector(".header-left");
-  if (headerLeft.querySelector(".search-box-mobile")) return;
+  const existing = headerLeft.querySelector(".search-box-mobile");
+  if (window.innerWidth > 768) {
+    // Desktop: remove search mobile se existir
+    if (existing) existing.remove();
+    return;
+  }
+  // Mobile: cria search box se nao existir
+  if (existing) return;
   const box = document.createElement("div");
   box.className = "search-box-mobile";
   box.innerHTML = `<input type="text" placeholder="Buscar..." onkeydown="if(event.key==='Enter')doSearch(this.value)">
     <button onclick="doSearch(this.previousElementSibling.value)" aria-label="Buscar">&#128269;</button>`;
   headerLeft.appendChild(box);
 }
+
+// Reagir a mudanca de tamanho (rotacao, resize)
+window.addEventListener("resize", setupMobileSearch);
 
 async function init() {
   setupMobileSearch();
@@ -1162,10 +1172,38 @@ async function playInBrowser(body) {
   const streamUrl = result.proxy_url || result.url;
   startHlsPlayback(video, streamUrl, loading);
 
+  // Adiciona legendas se disponiveis
+  addSubtitles(video, result.subtitles || []);
+
   // Show cast/share buttons
   if (result.proxy_url) {
     showCastShareButtons(result.proxy_url);
   }
+}
+
+function addSubtitles(video, subtitles) {
+  // Remove legendas anteriores
+  video.querySelectorAll("track").forEach(t => t.remove());
+  if (!subtitles || subtitles.length === 0) return;
+
+  subtitles.forEach((subUrl, i) => {
+    const track = document.createElement("track");
+    // Proxy pra evitar CORS
+    track.src = "/api/proxy-sub?url=" + encodeURIComponent(subUrl);
+    track.kind = "subtitles";
+    // Tenta detectar idioma pelo nome do arquivo
+    const lower = subUrl.toLowerCase();
+    if (lower.includes("portug") || lower.includes("pt-br") || lower.includes("pt_br")) {
+      track.srclang = "pt";
+      track.label = "Portugues";
+    } else {
+      track.srclang = "en";
+      track.label = "English";
+    }
+    // Ativa a primeira legenda por padrao
+    if (i === 0) track.default = true;
+    video.appendChild(track);
+  });
 }
 
 function startHlsPlayback(video, url, loading) {
@@ -1236,6 +1274,8 @@ function closePlayer() {
   }
   video.pause();
   video.src = "";
+  // Remove legendas
+  video.querySelectorAll("track").forEach(t => t.remove());
   document.getElementById("player-top-controls").style.display = "none";
 }
 
