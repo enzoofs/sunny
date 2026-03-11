@@ -1,6 +1,6 @@
 #!/bin/bash
 # Fake mpv that captures the stream URL and headers instead of playing.
-# Luffy calls: mpv URL --referrer=REF --user-agent=UA --force-media-title=TITLE [--sub-file=SUB...]
+# Sunny calls: mpv URL --referrer=REF --user-agent=UA --force-media-title=TITLE [--sub-file=SUB...]
 
 URL=""
 REFERER=""
@@ -23,7 +23,7 @@ for arg in "$@"; do
 done
 
 # Write to the output file specified by FAKE_MPV_OUTPUT env var
-OUT="${FAKE_MPV_OUTPUT:-/tmp/luffy-stream-result.json}"
+OUT="${FAKE_MPV_OUTPUT:-/tmp/sunny-stream-result.json}"
 
 cat > "$OUT" << JSONEOF
 {
