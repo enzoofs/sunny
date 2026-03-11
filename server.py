@@ -301,6 +301,27 @@ class CatalogHandler(SimpleHTTPRequestHandler):
         elif path == "/api/config":
             self._json_response({"has_api_key": bool(get_api_key())})
 
+        elif path == "/api/proxy-sub":
+            # Proxy de legendas externas (evita CORS no browser)
+            sub_url = params.get("url", "")
+            if not sub_url:
+                self.send_error(400, "Missing url param")
+                return
+            try:
+                req = urllib.request.Request(sub_url, headers={
+                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                })
+                with urllib.request.urlopen(req, timeout=15) as resp:
+                    content = resp.read()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/vtt")
+                self.send_header("Content-Length", len(content))
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(content)
+            except Exception as e:
+                self.send_error(502, f"Subtitle proxy error: {e}")
+
         elif path.startswith("/api/proxy/"):
             self._handle_proxy(path)
 
