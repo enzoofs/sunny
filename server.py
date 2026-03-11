@@ -19,7 +19,7 @@ from pathlib import Path
 log = logging.getLogger("sunny")
 
 CONFIG_PATH = Path(__file__).parent / "config.json"
-LUFFY_HISTORY = Path.home() / ".config" / "luffy" / "history.sqlite"
+SUNNY_HISTORY = Path.home() / ".config" / "sunny" / "history.sqlite"
 STATIC_DIR = Path(__file__).parent / "static"
 
 def load_config():
@@ -135,9 +135,9 @@ ANIME_GENRES = {
 
 
 def get_history():
-    if not LUFFY_HISTORY.exists():
+    if not SUNNY_HISTORY.exists():
         return []
-    conn = sqlite3.connect(str(LUFFY_HISTORY))
+    conn = sqlite3.connect(str(SUNNY_HISTORY))
     conn.row_factory = sqlite3.Row
     rows = conn.execute("""
         SELECT title, season, episode, ep_name, provider, position_secs, watched_at,
@@ -161,9 +161,9 @@ def get_history():
     return result
 
 def delete_history(title):
-    if not LUFFY_HISTORY.exists():
+    if not SUNNY_HISTORY.exists():
         return False
-    conn = sqlite3.connect(str(LUFFY_HISTORY))
+    conn = sqlite3.connect(str(SUNNY_HISTORY))
     conn.execute("DELETE FROM history WHERE title = ?", (title,))
     conn.commit()
     conn.close()
@@ -171,9 +171,9 @@ def delete_history(title):
 
 
 def get_full_history(title):
-    if not LUFFY_HISTORY.exists():
+    if not SUNNY_HISTORY.exists():
         return []
-    conn = sqlite3.connect(str(LUFFY_HISTORY))
+    conn = sqlite3.connect(str(SUNNY_HISTORY))
     conn.row_factory = sqlite3.Row
     rows = conn.execute("""
         SELECT title, season, episode, ep_name, provider, position_secs, watched_at

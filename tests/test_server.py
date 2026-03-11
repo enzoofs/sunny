@@ -62,7 +62,7 @@ class TestLoadSaveConfig(unittest.TestCase):
         import server
         original_path = server.CONFIG_PATH
         try:
-            server.CONFIG_PATH = Path("/tmp/nonexistent_luffy_config.json")
+            server.CONFIG_PATH = Path("/tmp/nonexistent_sunny_config.json")
             cfg = server.load_config()
             self.assertEqual(cfg, {})
         finally:
@@ -72,13 +72,13 @@ class TestLoadSaveConfig(unittest.TestCase):
 class TestHistory(unittest.TestCase):
     def test_missing_db_returns_empty(self):
         import server
-        original = server.LUFFY_HISTORY
+        original = server.SUNNY_HISTORY
         try:
-            server.LUFFY_HISTORY = Path("/tmp/nonexistent_history.sqlite")
+            server.SUNNY_HISTORY = Path("/tmp/nonexistent_history.sqlite")
             self.assertEqual(server.get_history(), [])
             self.assertEqual(server.get_full_history("test"), [])
         finally:
-            server.LUFFY_HISTORY = original
+            server.SUNNY_HISTORY = original
 
 
 if __name__ == "__main__":
